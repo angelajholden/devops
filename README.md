@@ -1,9 +1,18 @@
 # Deployment Documentation
 
+This documentation will help you learn to setup a LAMP stack server on Digital Ocean, configure your domain's DNS settings, and deploy your website to a server. There are tutorials for both Windows and MacOS/Linux.
+
 ## TOC
 
 -   [How to Deploy a Website to Digital Ocean 💧 LAMP + Rsync (MacOS/Linux) + DNS Setup](./RSYNC.md)
 -   [How to Deploy a Website to Digital Ocean 💧 LAMP + SFTP (Windows) + DNS Setup](./SFTP.md)
+
+## Sign Up!
+
+These are affiliate links. If you sign up using my link, I get a small commission. It's totally optional, but it helps support the channel.
+
+-   Create a DigitalOcean hosting account: [DigitalOcean](https://www.digitalocean.com/?refcode=510e633915b2&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge)
+-   Use hover.com to register a domain: [Hover](https://hover.com/SjMp9blQ)
 
 ## Helpful Links
 
