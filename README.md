@@ -1,4 +1,4 @@
-# Deployment Documentation
+# DevOps for Frontend Developers
 
 This documentation will help you learn to setup a LAMP stack server on Digital Ocean, configure your domain's DNS settings, and deploy your website to a server. There are tutorials for both Windows and MacOS/Linux.
 

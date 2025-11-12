@@ -1,5 +1,12 @@
 # How to Deploy a Website to Digital Ocean 💧 LAMP + Rsync (MacOS/Linux) + DNS Setup
 
+## Sign Up!
+
+These are affiliate links. If you sign up using my link, I get a small commission. It's totally optional, but it helps support the channel.
+
+-   Create a DigitalOcean hosting account: [DigitalOcean](https://www.digitalocean.com/?refcode=510e633915b2&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge)
+-   Use hover.com to register a domain: [Hover](https://hover.com/SjMp9blQ)
+
 ## How To Use the LAMP 1-Click Install on DigitalOcean
 
 https://www.digitalocean.com/community/tutorials/how-to-use-the-lamp-1-click-install-on-digitalocean
