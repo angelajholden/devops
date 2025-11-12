@@ -197,7 +197,9 @@ sudo chmod g+s /var/www/html
 
 ### Deploy via SFTP using FileZilla
 
-[Download FileZilla](https://filezilla-project.org/)
+-   [Download FileZilla Client](https://filezilla-project.org/)
+
+![Screenshot of FileZilla.com](./FileZilla.png)
 
 ```zsh
 # Just in case you need to reset ownership/permissions after rsync:
