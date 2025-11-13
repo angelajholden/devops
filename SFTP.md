@@ -198,8 +198,26 @@ sudo chmod g+s /var/www/html
 ### Deploy via SFTP using FileZilla
 
 -   [Download FileZilla Client](https://filezilla-project.org/)
+-   File > Site Manager
+-   Click "New Site" > Type in a name
+-   Protocol > SFTP (SSH File Transfer Protocol)
+-   Host: thelemonstack.com (can also be the IP address)
+-   Port: 22 (but you can leave this blank)
+-   Logon Type: Key file
+-   User: angela (sudo user)
+-   Key file: /User/angelajholden/.ssh/id_abc1234
+-   Click "Connect"
+-   Navigate to the local site on the left: `/Users/angelajholden/Projects/the-lemon-stack/`
+-   Navigate to the remote site on the right: `/var/www/html`
+-   Drag the files you want to deploy from the left window to the right window.
 
-![Screenshot of FileZilla.com](./FileZilla.png)
+Don't deploy any file or directory that isn't required for site functionality. You should always exclude the following files:
+
+-   .git
+-   .gitignore
+-   Any file with .md
+-   .DS_Store (on a Mac)
+-   Design files or directories
 
 ```zsh
 # Just in case you need to reset ownership/permissions after rsync:
