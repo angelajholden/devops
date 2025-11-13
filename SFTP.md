@@ -15,7 +15,7 @@ https://www.digitalocean.com/community/tutorials/how-to-use-the-lamp-1-click-ins
 
 1. Do this with the domain registrar.
 2. Create an A Record to the IP address.
-3. Create a CNAME for 'www' with a value or target of 'fiberandkraft.com'.
+3. Create a CNAME for 'www' with a value or target of 'thelemonstack.com'.
 4. Add the domain name to Digital Ocean.
 
 ## Droplet Setup
@@ -137,7 +137,7 @@ systemctl reload ssh
 ```zsh
 # logout + log back in as sudo user
 exit
-ssh angela@fiberandkraft.com
+ssh angela@thelemonstack.com
 ```
 
 ### Possible Warning
@@ -156,14 +156,14 @@ SHA256:abc123abc123abc123abc123abc123abc123abc123abc123.
 Please contact your system administrator.
 Add correct host key in /Users/angelajholden/.ssh/known_hosts to get rid of this message.
 Offending ED25519 key in /Users/angelajholden/.ssh/known_hosts:29
-Host key for fiberandkraft.com has changed and you have requested strict checking.
+Host key for thelemonstack.com has changed and you have requested strict checking.
 Host key verification failed.
 
 # remove the domain from your local known_hosts file
-ssh-keygen -R fiberandkraft.com
+ssh-keygen -R thelemonstack.com
 
 # login again
-ssh angela@fiberandkraft.com
+ssh angela@thelemonstack.com
 ```
 
 ### Add sudo user to the www-data group
@@ -173,7 +173,7 @@ sudo usermod -aG www-data angela
 
 # logout + log back in for the group change to take effect
 exit
-ssh angela@fiberandkraft.com
+ssh angela@thelemonstack.com
 
 # confirm it worked
 groups
@@ -231,7 +231,7 @@ sudo find /var/www/html -type f -exec chmod 644 {} \;
 ### Make sure DNS is ready
 
 ```zsh
-ping fiberandkraft.com
+ping thelemonstack.com
 # crtl + c to quit
 ```
 
@@ -254,7 +254,7 @@ Browsers are checking the domain on port 443 first, and if the SSL/TLS handshake
 
 ```zsh
 # Run Certbot’s Apache plugin:
-sudo certbot --apache -d fiberandkraft.com -d www.fiberandkraft.com
+sudo certbot --apache -d thelemonstack.com -d www.thelemonstack.com
 ```
 
 #### Certbot will:
@@ -267,7 +267,7 @@ sudo certbot --apache -d fiberandkraft.com -d www.fiberandkraft.com
 ```zsh
 # When it’s done, you’ll see something like:
 Congratulations! Your certificate and chain have been saved at:
-/etc/letsencrypt/live/fiberandkraft.com/fullchain.pem
+/etc/letsencrypt/live/thelemonstack.com/fullchain.pem
 ```
 
 ### Enable SSL site if needed
@@ -306,8 +306,8 @@ Congratulations, all renewals succeeded.
 sudo certbot certificates
 
 # You’ll see a list like:
-Certificate Name: fiberandkraft.com
-Domains: fiberandkraft.com www.fiberandkraft.com
+Certificate Name: thelemonstack.com
+Domains: thelemonstack.com www.thelemonstack.com
 Expiry Date: 2026-01-20
 ```
 
@@ -322,17 +322,17 @@ sudo nano /etc/apache2/sites-available/000-default.conf
 Add this INSIDE `<VirtualHost *:80> </VirtualHost>`, at the top of the page.
 
 ```zsh
-ServerName fiberandkraft.com
-ServerAlias www.fiberandkraft.com
-Redirect 301 / https://fiberandkraft.com/
+ServerName thelemonstack.com
+ServerAlias www.thelemonstack.com
+Redirect 301 / https://thelemonstack.com/
 ```
 
 Comment out these four rewrite lines at the bottom of the file:
 
 ```zsh
 # RewriteEngine on
-# RewriteCond %{SERVER_NAME} =www.fiberandkraft.com [OR]
-# RewriteCond %{SERVER_NAME} =fiberandkraft.com
+# RewriteCond %{SERVER_NAME} =www.thelemonstack.com [OR]
+# RewriteCond %{SERVER_NAME} =thelemonstack.com
 # RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
 ```
 
@@ -349,12 +349,12 @@ The port 443 vhost file should look like this:
 <VirtualHost *:443>
     ServerAdmin webmaster@localhost
     DocumentRoot /var/www/html
-    ServerName fiberandkraft.com
-    ServerAlias www.fiberandkraft.com
+    ServerName thelemonstack.com
+    ServerAlias www.thelemonstack.com
 
     RewriteEngine On
-    RewriteCond %{HTTP_HOST} ^www\.fiberandkraft\.com$ [NC]
-    RewriteRule ^ https://fiberandkraft.com%{REQUEST_URI} [R=301,L]
+    RewriteCond %{HTTP_HOST} ^www\.thelemonstack\.com$ [NC]
+    RewriteRule ^ https://thelemonstack.com%{REQUEST_URI} [R=301,L]
 
     <Directory /var/www/html/>
         Options Indexes FollowSymLinks
@@ -370,8 +370,8 @@ The port 443 vhost file should look like this:
     </IfModule>
 
     Include /etc/letsencrypt/options-ssl-apache.conf
-    SSLCertificateFile /etc/letsencrypt/live/fiberandkraft.com/fullchain.pem
-    SSLCertificateKeyFile /etc/letsencrypt/live/fiberandkraft.com/privkey.pem
+    SSLCertificateFile /etc/letsencrypt/live/thelemonstack.com/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/thelemonstack.com/privkey.pem
 </VirtualHost>
 </IfModule>
 ```
@@ -391,14 +391,14 @@ sudo systemctl reload apache2
 
 ```zsh
 # Then you can confirm the redirect behavior later in your browser or by running:
-curl -I http://fiberandkraft.com
-curl -I http://www.fiberandkraft.com
-curl -I https://fiberandkraft.com
-curl -I https://www.fiberandkraft.com
+curl -I http://thelemonstack.com
+curl -I http://www.thelemonstack.com
+curl -I https://thelemonstack.com
+curl -I https://www.thelemonstack.com
 
 # You should see:
 HTTP/1.1 301 Moved Permanently
-Location: https://fiberandkraft.com/
+Location: https://thelemonstack.com/
 ```
 
 ### Test the result
@@ -407,8 +407,8 @@ Location: https://fiberandkraft.com/
 
 ```zsh
 # Open your site in the browser
-http://fiberandkraft.com
-http://www.fiberandkraft.com
-https://fiberandkraft.com
-https://www.fiberandkraft.com
+http://thelemonstack.com
+http://www.thelemonstack.com
+https://thelemonstack.com
+https://www.thelemonstack.com
 ```
