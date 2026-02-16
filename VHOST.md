@@ -56,9 +56,9 @@ enter (again)
 ### Create the sub domain + public_html directories
 
 ```zsh
-mkdir -p /var/www/scenic.practicelayouts.com
-cd /var/www/scenic.practicelayouts.com
-mkdir -p public_html
+sudo mkdir -p /var/www/scenic.practicelayouts.com
+sudo cd /var/www/scenic.practicelayouts.com
+sudo mkdir -p public_html
 ```
 
 ### Fix the permissions
@@ -86,8 +86,8 @@ sudo chmod g+s /var/www/scenic.practicelayouts.com
 - User: angela (sudo user)
 - Key file: /User/angelajholden/.ssh/id_abc1234
 - Click "Connect"
-- Navigate to the local site on the left: `/Users/angelajholden/Projects/the-lemon-stack/`
-- Navigate to the remote site on the right: `/var/www/html`
+- Navigate to the local site on the left: `/Users/angelajholden/Projects/scenic/`
+- Navigate to the remote site on the right: `/var/www/scenic.practicelayouts.com/public_html`
 - Drag the files you want to deploy from the left window to the right window.
 
 Don't deploy any file or directory that isn't required for site functionality. You should always exclude the following files:
