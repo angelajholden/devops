@@ -1,11 +1,11 @@
-# How to Deploy a Website to Digital Ocean 💧 LAMP + SFTP (Windows) + DNS Setup
+# How to Deploy a Website to DigitalOcean 💧 LAMP + SFTP (Windows) + DNS Setup
 
 ## Sign Up!
 
 These are affiliate links. If you sign up using my link, I get a small commission. It's totally optional, but it helps support the channel.
 
--   Create a DigitalOcean hosting account: [DigitalOcean](https://www.digitalocean.com/?refcode=510e633915b2&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge)
--   Use hover.com to register a domain: [Hover](https://hover.com/SjMp9blQ)
+- Create a DigitalOcean hosting account: [DigitalOcean](https://www.digitalocean.com/?refcode=510e633915b2&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge)
+- Use hover.com to register a domain: [Hover](https://hover.com/SjMp9blQ)
 
 ## How To Use the LAMP 1-Click Install on DigitalOcean
 
@@ -16,7 +16,7 @@ https://www.digitalocean.com/community/tutorials/how-to-use-the-lamp-1-click-ins
 1. Do this with the domain registrar.
 2. Create an A Record to the IP address.
 3. Create a CNAME for 'www' with a value or target of 'thelemonstack.com'.
-4. Add the domain name to Digital Ocean.
+4. Add the domain name to DigitalOcean.
 
 ## Droplet Setup
 
@@ -95,12 +95,12 @@ ufw enable
 
 You can leave the questions blank when creating a sudo user:
 
--   Full Name []:
--   Room Number []:
--   Work Phone []:
--   Home Phone []:
--   Other []:
--   Is this information correct? [Y/n]
+- Full Name []:
+- Room Number []:
+- Work Phone []:
+- Home Phone []:
+- Other []:
+- Is this information correct? [Y/n]
 
 ```zsh
 adduser angela
@@ -197,27 +197,27 @@ sudo chmod g+s /var/www/html
 
 ### Deploy via SFTP using FileZilla
 
--   [Download FileZilla Client](https://filezilla-project.org/)
--   File > Site Manager
--   Click "New Site" > Type in a name
--   Protocol > SFTP (SSH File Transfer Protocol)
--   Host: thelemonstack.com (can also be the IP address)
--   Port: 22 (but you can leave this blank)
--   Logon Type: Key file
--   User: angela (sudo user)
--   Key file: /User/angelajholden/.ssh/id_abc1234
--   Click "Connect"
--   Navigate to the local site on the left: `/Users/angelajholden/Projects/the-lemon-stack/`
--   Navigate to the remote site on the right: `/var/www/html`
--   Drag the files you want to deploy from the left window to the right window.
+- [Download FileZilla Client](https://filezilla-project.org/)
+- File > Site Manager
+- Click "New Site" > Type in a name
+- Protocol > SFTP (SSH File Transfer Protocol)
+- Host: thelemonstack.com (can also be the IP address)
+- Port: 22 (but you can leave this blank)
+- Logon Type: Key file
+- User: angela (sudo user)
+- Key file: /User/angelajholden/.ssh/id_abc1234
+- Click "Connect"
+- Navigate to the local site on the left: `/Users/angelajholden/Projects/the-lemon-stack/`
+- Navigate to the remote site on the right: `/var/www/html`
+- Drag the files you want to deploy from the left window to the right window.
 
 Don't deploy any file or directory that isn't required for site functionality. You should always exclude the following files:
 
--   .git
--   .gitignore
--   Any file with .md
--   .DS_Store (on a Mac)
--   Design files or directories
+- .git
+- .gitignore
+- Any file with .md
+- .DS_Store (on a Mac)
+- Design files or directories
 
 ```zsh
 # Just in case you need to reset ownership/permissions after rsync:

@@ -1,11 +1,11 @@
-# How to Deploy a Website to Digital Ocean 💧 LAMP + Rsync (MacOS/Linux) + DNS Setup
+# How to Deploy a Website to DigitalOcean 💧 LAMP + Rsync (MacOS/Linux) + DNS Setup
 
 ## Sign Up!
 
 These are affiliate links. If you sign up using my link, I get a small commission. It's totally optional, but it helps support the channel.
 
--   Create a DigitalOcean hosting account: [DigitalOcean](https://www.digitalocean.com/?refcode=510e633915b2&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge)
--   Use hover.com to register a domain: [Hover](https://hover.com/SjMp9blQ)
+- Create a DigitalOcean hosting account: [DigitalOcean](https://www.digitalocean.com/?refcode=510e633915b2&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge)
+- Use hover.com to register a domain: [Hover](https://hover.com/SjMp9blQ)
 
 ## How To Use the LAMP 1-Click Install on DigitalOcean
 
@@ -16,7 +16,7 @@ https://www.digitalocean.com/community/tutorials/how-to-use-the-lamp-1-click-ins
 1. Do this with the domain registrar.
 2. Create an A Record to the IP address.
 3. Create a CNAME for 'www' with a value or target of 'fiberandkraft.com'.
-4. Add the domain name to Digital Ocean.
+4. Add the domain name to DigitalOcean.
 
 ## Droplet Setup
 
@@ -95,12 +95,12 @@ ufw enable
 
 You can leave the questions blank when creating a sudo user:
 
--   Full Name []:
--   Room Number []:
--   Work Phone []:
--   Home Phone []:
--   Other []:
--   Is this information correct? [Y/n]
+- Full Name []:
+- Room Number []:
+- Work Phone []:
+- Home Phone []:
+- Other []:
+- Is this information correct? [Y/n]
 
 ```zsh
 adduser angela
@@ -199,8 +199,8 @@ sudo chmod g+s /var/www/html
 
 #### Just remember that the trailing slash in your local directory path matters:
 
--   `/Users/angelajholden/Projects/coming-soon/` (with `/`) syncs contents of that folder into /var/www/html/.
--   Without `/`, it would nest the folder inside (`/var/www/html/coming-soon/`).
+- `/Users/angelajholden/Projects/coming-soon/` (with `/`) syncs contents of that folder into /var/www/html/.
+- Without `/`, it would nest the folder inside (`/var/www/html/coming-soon/`).
 
 ```zsh
 # rsync flags: -a archive, -z compress, -P progress/partial, --delete keeps remote in sync.

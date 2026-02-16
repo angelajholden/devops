@@ -13,14 +13,14 @@ These are affiliate links. If you sign up using my link, I get a small commissio
 
 ## Droplet Setup
 
-- [How to Deploy a Website to Digital Ocean 💧 LAMP + SFTP (Windows) + DNS Setup](SFTP.md)
-- [How to Deploy a Website to Digital Ocean 💧 LAMP + Rsync (MacOS/Linux) + DNS Setup](RSYNC.md)
+- [How to Deploy a Website to DigitalOcean 💧 LAMP + SFTP (Windows) + DNS Setup](SFTP.md)
+- [How to Deploy a Website to DigitalOcean 💧 LAMP + Rsync (MacOS/Linux) + DNS Setup](RSYNC.md)
 
 ## DNS: Point Your Domain
 
 1. Do this with the domain registrar.
 2. Create an A Record to the IP address.
-3. Add the domain name to Digital Ocean.
+3. Add the domain name to DigitalOcean.
 
 ### SSH in as sudo user
 
