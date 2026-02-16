@@ -9,15 +9,18 @@ These are affiliate links. If you sign up using my link, I get a small commissio
 
 ## How To Use the LAMP 1-Click Install on DigitalOcean
 
-https://www.digitalocean.com/community/tutorials/how-to-use-the-lamp-1-click-install-on-digitalocean
+- [How To Use the LAMP 1-Click Install on DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-use-the-lamp-1-click-install-on-digitalocean)
+
+## Droplet Setup
+
+- [How to Deploy a Website to Digital Ocean 💧 LAMP + SFTP (Windows) + DNS Setup](SFTP.md)
+- [How to Deploy a Website to Digital Ocean 💧 LAMP + Rsync (MacOS/Linux) + DNS Setup](RSYNC.md)
 
 ## DNS: Point Your Domain
 
 1. Do this with the domain registrar.
 2. Create an A Record to the IP address.
 3. Add the domain name to Digital Ocean.
-
-## Droplet Setup
 
 ### SSH in as sudo user
 
