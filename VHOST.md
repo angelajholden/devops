@@ -105,11 +105,9 @@ sudo find /var/www/colorado.practicelayouts.com -type d -exec chmod 755 {} \;
 sudo find /var/www/colorado.practicelayouts.com -type f -exec chmod 644 {} \;
 ```
 
-## Edit the Apache Virtual Host Files
+## Create + Edit the Port 80 Virtual Host File
 
-### Port 80 VHost
-
-Create the VHost file
+Create (copy) the VHost file
 
 ```zsh
 sudo cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/colorado.practicelayouts.com.conf
@@ -135,48 +133,6 @@ Comment out these four rewrite lines at the bottom of the file:
 # RewriteCond %{SERVER_NAME} =www.thelemonstack.com [OR]
 # RewriteCond %{SERVER_NAME} =thelemonstack.com
 # RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
-```
-
-### Port 443 VHost
-
-```zsh
-sudo nano /etc/apache2/sites-available/colorado.practicelayouts.com-le-ssl.conf
-```
-
-The port 443 vhost file should look like this:
-
-```zsh
-<IfModule mod_ssl.c>
-<VirtualHost *:443>
-    ServerAdmin webmaster@localhost
-    DocumentRoot /var/www/colorado.practicelayouts.com/public_html
-    ServerName colorado.practicelayouts.com
-
-    <Directory /var/www/colorado.practicelayouts.com/public_html/>
-        Options Indexes FollowSymLinks
-        AllowOverride All
-        Require all granted
-    </Directory>
-
-    ErrorLog ${APACHE_LOG_DIR}/error.log
-    CustomLog ${APACHE_LOG_DIR}/access.log combined
-
-    <IfModule mod_dir.c>
-        DirectoryIndex index.php index.pl index.cgi index.html index.xhtml index.htm
-    </IfModule>
-
-    Include /etc/letsencrypt/options-ssl-apache.conf
-    SSLCertificateFile /etc/letsencrypt/live/colorado.practicelayouts.com/fullchain.pem
-    SSLCertificateKeyFile /etc/letsencrypt/live/colorado.practicelayouts.com/privkey.pem
-</VirtualHost>
-</IfModule>
-```
-
-### Make sure the rewite module is enabled and reload Apache
-
-```zsh
-sudo a2enmod rewrite
-sudo systemctl reload apache2
 ```
 
 ## Let's Encrypt
@@ -262,6 +218,43 @@ sudo certbot certificates
 Certificate Name: colorado.practicelayouts.com
 Domains: colorado.practicelayouts.com
 Expiry Date: 2026-05-17
+```
+
+## Edit the Port 443 Virtual Host File
+
+Open the port 443 vhost file
+
+```zsh
+sudo nano /etc/apache2/sites-available/colorado.practicelayouts.com-le-ssl.conf
+```
+
+The port 443 vhost file should look like this:
+
+```zsh
+<IfModule mod_ssl.c>
+<VirtualHost *:443>
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/colorado.practicelayouts.com/public_html
+    ServerName colorado.practicelayouts.com
+
+    <Directory /var/www/colorado.practicelayouts.com/public_html/>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+    <IfModule mod_dir.c>
+        DirectoryIndex index.php index.pl index.cgi index.html index.xhtml index.htm
+    </IfModule>
+
+    Include /etc/letsencrypt/options-ssl-apache.conf
+    SSLCertificateFile /etc/letsencrypt/live/colorado.practicelayouts.com/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/colorado.practicelayouts.com/privkey.pem
+</VirtualHost>
+</IfModule>
 ```
 
 ### Make sure the rewite module is enabled and reload Apache
