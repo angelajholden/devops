@@ -109,6 +109,14 @@ sudo find /var/www/colorado.practicelayouts.com -type f -exec chmod 644 {} \;
 
 ### Port 80 VHost
 
+Create the VHost file
+
+```zsh
+sudo cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/colorado.practicelayouts.com.conf
+```
+
+Open the VHost file to edit
+
 ```zsh
 sudo nano /etc/apache2/sites-available/colorado.practicelayouts.com.conf
 ```
