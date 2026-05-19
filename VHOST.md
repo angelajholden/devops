@@ -56,8 +56,8 @@ enter (again)
 ### Create the sub domain + public_html directories
 
 ```zsh
-sudo mkdir -p /var/www/scenic.practicelayouts.com
-sudo cd /var/www/scenic.practicelayouts.com
+sudo mkdir -p /var/www/colorado.practicelayouts.com
+sudo cd /var/www/colorado.practicelayouts.com
 sudo mkdir -p public_html
 ```
 
@@ -66,11 +66,11 @@ sudo mkdir -p public_html
 That 775 gives group write access, so 'heidi' (as part of the www-data group) can update files without breaking Apache ownership.
 
 ```zsh
-sudo chown -R www-data:www-data /var/www/scenic.practicelayouts.com
-sudo chmod -R 775 /var/www/scenic.practicelayouts.com
+sudo chown -R www-data:www-data /var/www/colorado.practicelayouts.com
+sudo chmod -R 775 /var/www/colorado.practicelayouts.com
 
 # If you want to make sure all future files keep that group:
-sudo chmod g+s /var/www/scenic.practicelayouts.com
+sudo chmod g+s /var/www/colorado.practicelayouts.com
 # That sets the setgid bit, so any new files/folders inherit the www-data group automatically.
 ```
 
@@ -86,8 +86,8 @@ sudo chmod g+s /var/www/scenic.practicelayouts.com
 - User: angela (sudo user)
 - Key file: /User/angelajholden/.ssh/id_abc1234
 - Click "Connect"
-- Navigate to the local site on the left: `/Users/angelajholden/Projects/scenic/`
-- Navigate to the remote site on the right: `/var/www/scenic.practicelayouts.com/public_html`
+- Navigate to the local site on the left: `/Users/angelajholden/Projects/colorado/`
+- Navigate to the remote site on the right: `/var/www/colorado.practicelayouts.com/public_html`
 - Drag the files you want to deploy from the left window to the right window.
 
 Don't deploy any file or directory that isn't required for site functionality. You should always exclude the following files:
@@ -100,9 +100,75 @@ Don't deploy any file or directory that isn't required for site functionality. Y
 
 ```zsh
 # Just in case you need to reset ownership/permissions after rsync:
-sudo chown -R www-data:www-data /var/www/scenic.practicelayouts.com
-sudo find /var/www/scenic.practicelayouts.com -type d -exec chmod 755 {} \;
-sudo find /var/www/scenic.practicelayouts.com -type f -exec chmod 644 {} \;
+sudo chown -R www-data:www-data /var/www/colorado.practicelayouts.com
+sudo find /var/www/colorado.practicelayouts.com -type d -exec chmod 755 {} \;
+sudo find /var/www/colorado.practicelayouts.com -type f -exec chmod 644 {} \;
+```
+
+## Edit the Apache Virtual Host Files
+
+### Port 80 VHost
+
+```zsh
+sudo nano /etc/apache2/sites-available/colorado.practicelayouts.com.conf
+```
+
+Add this INSIDE `<VirtualHost *:80> </VirtualHost>`, at the top of the page.
+
+```zsh
+ServerName colorado.practicelayouts.com
+Redirect 301 / https://colorado.practicelayouts.com/
+```
+
+Comment out these four rewrite lines at the bottom of the file:
+
+```zsh
+# RewriteEngine on
+# RewriteCond %{SERVER_NAME} =www.thelemonstack.com [OR]
+# RewriteCond %{SERVER_NAME} =thelemonstack.com
+# RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
+```
+
+### Port 443 VHost
+
+```zsh
+sudo nano /etc/apache2/sites-available/colorado.practicelayouts.com-le-ssl.conf
+```
+
+The port 443 vhost file should look like this:
+
+```zsh
+<IfModule mod_ssl.c>
+<VirtualHost *:443>
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/colorado.practicelayouts.com/public_html
+    ServerName colorado.practicelayouts.com
+
+    <Directory /var/www/colorado.practicelayouts.com/public_html/>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+    <IfModule mod_dir.c>
+        DirectoryIndex index.php index.pl index.cgi index.html index.xhtml index.htm
+    </IfModule>
+
+    Include /etc/letsencrypt/options-ssl-apache.conf
+    SSLCertificateFile /etc/letsencrypt/live/colorado.practicelayouts.com/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/colorado.practicelayouts.com/privkey.pem
+</VirtualHost>
+</IfModule>
+```
+
+### Make sure the rewite module is enabled and reload Apache
+
+```zsh
+sudo a2enmod rewrite
+sudo systemctl reload apache2
 ```
 
 ## Let's Encrypt
@@ -110,7 +176,7 @@ sudo find /var/www/scenic.practicelayouts.com -type f -exec chmod 644 {} \;
 ### Make sure DNS is ready
 
 ```zsh
-ping scenic.practicelayouts.com
+ping colorado.practicelayouts.com
 # crtl + c to quit
 ```
 
@@ -133,7 +199,7 @@ Browsers are checking the domain on port 443 first, and if the SSL/TLS handshake
 
 ```zsh
 # Run Certbot’s Apache plugin:
-sudo certbot --apache -d scenic.practicelayouts.com
+sudo certbot --apache -d colorado.practicelayouts.com
 ```
 
 #### Certbot will:
@@ -146,7 +212,7 @@ sudo certbot --apache -d scenic.practicelayouts.com
 ```zsh
 # When it’s done, you’ll see something like:
 Congratulations! Your certificate and chain have been saved at:
-/etc/letsencrypt/live/scenic.practicelayouts.com/fullchain.pem
+/etc/letsencrypt/live/colorado.practicelayouts.com/fullchain.pem
 ```
 
 ### Enable SSL site if needed
@@ -185,68 +251,9 @@ Congratulations, all renewals succeeded.
 sudo certbot certificates
 
 # You’ll see a list like:
-Certificate Name: scenic.practicelayouts.com
-Domains: scenic.practicelayouts.com
+Certificate Name: colorado.practicelayouts.com
+Domains: colorado.practicelayouts.com
 Expiry Date: 2026-05-17
-```
-
-## Edit the Apache Virtual Host Files
-
-### Port 80 VHost
-
-```zsh
-sudo nano /etc/apache2/sites-available/scenic.practicelayouts.com.conf
-```
-
-Add this INSIDE `<VirtualHost *:80> </VirtualHost>`, at the top of the page.
-
-```zsh
-ServerName scenic.practicelayouts.com
-Redirect 301 / https://scenic.practicelayouts.com/
-```
-
-Comment out these four rewrite lines at the bottom of the file:
-
-```zsh
-# RewriteEngine on
-# RewriteCond %{SERVER_NAME} =www.thelemonstack.com [OR]
-# RewriteCond %{SERVER_NAME} =thelemonstack.com
-# RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
-```
-
-### Port 443 VHost
-
-```zsh
-sudo nano /etc/apache2/sites-available/scenic.practicelayouts.com-le-ssl.conf
-```
-
-The port 443 vhost file should look like this:
-
-```zsh
-<IfModule mod_ssl.c>
-<VirtualHost *:443>
-    ServerAdmin webmaster@localhost
-    DocumentRoot /var/www/scenic.practicelayouts.com/public_html
-    ServerName scenic.practicelayouts.com
-
-    <Directory /var/www/scenic.practicelayouts.com/public_html/>
-        Options Indexes FollowSymLinks
-        AllowOverride All
-        Require all granted
-    </Directory>
-
-    ErrorLog ${APACHE_LOG_DIR}/error.log
-    CustomLog ${APACHE_LOG_DIR}/access.log combined
-
-    <IfModule mod_dir.c>
-        DirectoryIndex index.php index.pl index.cgi index.html index.xhtml index.htm
-    </IfModule>
-
-    Include /etc/letsencrypt/options-ssl-apache.conf
-    SSLCertificateFile /etc/letsencrypt/live/scenic.practicelayouts.com/fullchain.pem
-    SSLCertificateKeyFile /etc/letsencrypt/live/scenic.practicelayouts.com/privkey.pem
-</VirtualHost>
-</IfModule>
 ```
 
 ### Make sure the rewite module is enabled and reload Apache
@@ -256,7 +263,7 @@ sudo a2enmod rewrite
 sudo systemctl reload apache2
 
 # If you want to be extra sure the SSL vhost is active:
-sudo a2ensite scenic.practicelayouts.com-le-ssl.conf
+sudo a2ensite colorado.practicelayouts.com-le-ssl.conf
 sudo systemctl reload apache2
 ```
 
@@ -264,12 +271,12 @@ sudo systemctl reload apache2
 
 ```zsh
 # Then you can confirm the redirect behavior later in your browser or by running:
-curl -I http://scenic.practicelayouts.com
-curl -I https://scenic.practicelayouts.com
+curl -I http://colorado.practicelayouts.com
+curl -I https://colorado.practicelayouts.com
 
 # You should see:
 HTTP/1.1 301 Moved Permanently
-Location: https://scenic.practicelayouts.com/
+Location: https://colorado.practicelayouts.com/
 ```
 
 ### Test the result
@@ -278,6 +285,6 @@ Location: https://scenic.practicelayouts.com/
 
 ```zsh
 # Open your site in the browser
-http://scenic.practicelayouts.com
-https://scenic.practicelayouts.com
+http://colorado.practicelayouts.com
+https://colorado.practicelayouts.com
 ```
