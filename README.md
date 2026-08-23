@@ -1,13 +1,28 @@
 # DevOps for Frontend Developers
 
-This documentation will help you set up LAMP and Node.js servers on DigitalOcean, configure your domain's DNS settings, and deploy your website or application to a server. There are tutorials for Windows, MacOS, and Linux.
+This documentation will help you set up, deploy, automate, and audit LAMP and Node.js servers on DigitalOcean. It includes DNS, SSH, Apache, Nginx, PM2, rsync, SFTP, HTTPS, and GitHub Actions workflows for Windows, MacOS, and Linux.
 
-## TOC
+## Documentation
+
+### LAMP Deployment
 
 - [How to Deploy a Website to DigitalOcean 💧 LAMP + Rsync (MacOS/Linux) + DNS Setup](RSYNC.md)
 - [How to Deploy a Website to DigitalOcean 💧 LAMP + SFTP (Windows) + DNS Setup](SFTP.md)
 - [How to Add a Subdomain on DigitalOcean 💧 Apache Virtual Host + DNS](VHOST.md)
+
+### Node.js Deployment
+
 - [How to Deploy a Node.js App to DigitalOcean 💧 Nginx + PM2 + Subdomain DNS](NODE.md)
+
+### GitHub Actions
+
+- [Deploy a Static LAMP Site to DigitalOcean With GitHub Actions](GITHUB-ACTIONS.md)
+- [Deploy a Node App to DigitalOcean With GitHub Actions](NODE-GITHUB-ACTIONS.md)
+
+### Server Audits
+
+- [LAMP Server Audit Checklist](LAMP-AUDIT.md)
+- [Node Server Audit Checklist](NODE-AUDIT.md)
 
 ## Sign Up!
 
