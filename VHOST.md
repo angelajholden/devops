@@ -57,7 +57,7 @@ enter (again)
 
 ```zsh
 sudo mkdir -p /var/www/colorado.practicelayouts.com
-sudo cd /var/www/colorado.practicelayouts.com
+cd /var/www/colorado.practicelayouts.com
 sudo mkdir -p public_html
 ```
 
