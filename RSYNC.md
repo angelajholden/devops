@@ -9,14 +9,14 @@ These are affiliate links. If you sign up using my link, I get a small commissio
 
 ## How To Use the LAMP 1-Click Install on DigitalOcean
 
-https://www.digitalocean.com/community/tutorials/how-to-use-the-lamp-1-click-install-on-digitalocean
+- [LAMP 1-Click App](https://docs.digitalocean.com/products/marketplace/catalog/lamp/)
 
 ## DNS: Point Your Domain
 
-1. Do this with the domain registrar.
-2. Create an A Record to the IP address.
-3. Create a CNAME for 'www' with a value or target of 'fiberandkraft.com'.
-4. Add the domain name to DigitalOcean.
+Create these records wherever your domain's authoritative DNS is managed. If your domain uses Hover's name servers, create the records in Hover. You do not need to add the domain to DigitalOcean Networking unless you have delegated DNS to DigitalOcean's name servers.
+
+1. Create an **A** record for `fiberandkraft.com` that points to the Droplet's public IPv4 address.
+2. Create a **CNAME** record for `www` with `fiberandkraft.com` as its target.
 
 ## Droplet Setup
 
@@ -122,13 +122,27 @@ chmod 700 /home/angela/.ssh
 chmod 600 /home/angela/.ssh/authorized_keys
 ```
 
-### Disable root Login with SSH
+### Test the new user before disabling root login
+
+Keep the root session open. In a second terminal on your local computer, confirm that the new account can use both SSH and sudo:
+
+```zsh
+ssh angela@<IP>
+sudo apache2ctl configtest
+```
+
+Continue only after the SSH login succeeds and Apache reports `Syntax OK`.
+
+### Disable root login with SSH
 
 ```zsh
 nano /etc/ssh/sshd_config
 # Set/confirm:
 #   PermitRootLogin no
 #   PasswordAuthentication no
+
+# Validate the SSH configuration before reloading it
+sshd -t
 systemctl reload ssh
 ```
 
@@ -142,7 +156,7 @@ ssh angela@fiberandkraft.com
 
 ### Possible Warning
 
-If you've used this domain on another server or IP, you might get this warning. You just need to delete the domain from your local `known_hosts` file.
+If you've intentionally moved this domain to a new server or IP, you might get this warning. First compare the new Droplet's SSH host-key fingerprint with the fingerprint shown in the warning. Remove the old entry only after you have confirmed that the server change is legitimate.
 
 ```zsh
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -184,16 +198,15 @@ angela sudo www-data
 
 ### Fix the permissions
 
-That 775 gives group write access, so angela (as part of the www-data group) can update files without breaking Apache ownership.
+Make the deployment user the owner and Apache's `www-data` group the group. Apache can read the site, while `angela` can create, update, and delete deployment files.
 
 ```zsh
-sudo chown -R www-data:www-data /var/www/html
-sudo chmod -R 775 /var/www/html
-
-# If you want to make sure all future files keep that group:
-sudo chmod g+s /var/www/html
-# That sets the setgid bit, so any new files/folders inherit the www-data group automatically.
+sudo chown -R angela:www-data /var/www/html
+sudo find /var/www/html -type d -exec chmod 2755 {} \;
+sudo find /var/www/html -type f -exec chmod 644 {} \;
 ```
+
+The leading `2` on directory permissions sets the setgid bit so new files and directories inherit the `www-data` group. If an application needs to write uploads, cache files, or other runtime data, grant write access only to those specific directories.
 
 ### Deploy via rsync from your local machine
 
@@ -203,198 +216,156 @@ sudo chmod g+s /var/www/html
 - Without `/`, it would nest the folder inside (`/var/www/html/coming-soon/`).
 
 ```zsh
-# rsync flags: -a archive, -z compress, -P progress/partial, --delete keeps remote in sync.
-rsync -avz --progress --delete --exclude '.git' --exclude '.gitignore' --exclude '.github' --exclude '.DS_Store' --exclude 'README.md' --exclude 'LICENSE.md' /Users/angelajholden/Projects/coming-soon/ angela@fiberandkraft.com:/var/www/html/
+# Preview the deployment first. --delete removes remote files that are not present locally.
+rsync -avz --no-owner --no-group --progress --delete --dry-run --exclude '.git' --exclude '.gitignore' --exclude '.github' --exclude '.DS_Store' --exclude '*.md' --exclude 'LICENSE*' /Users/angelajholden/Projects/coming-soon/ angela@fiberandkraft.com:/var/www/html/
 
-# Just in case you need to reset ownership/permissions after rsync:
-sudo chown -R www-data:www-data /var/www/html
-sudo find /var/www/html -type d -exec chmod 755 {} \;
+# Review the dry-run output carefully, then remove --dry-run to deploy.
+rsync -avz --no-owner --no-group --progress --delete --exclude '.git' --exclude '.gitignore' --exclude '.github' --exclude '.DS_Store' --exclude '*.md' --exclude 'LICENSE*' /Users/angelajholden/Projects/coming-soon/ angela@fiberandkraft.com:/var/www/html/
+```
+
+### Reset the remote permissions
+
+SSH back into the Droplet before running these commands. The `/var/www/html` path is on the server, not your local computer.
+
+```zsh
+ssh angela@fiberandkraft.com
+sudo chown -R angela:www-data /var/www/html
+sudo find /var/www/html -type d -exec chmod 2755 {} \;
 sudo find /var/www/html -type f -exec chmod 644 {} \;
 ```
 
-## Let's Encrypt
+## Configure Apache
 
-### Make sure DNS is ready
-
-```zsh
-ping fiberandkraft.com
-# crtl + c to quit
-```
-
-### Check that Certbot is installed
-
-```zsh
-# The 1-Click LAMP image should already have it
-certbot --version
-
-# If you get a version number, you’re set.
-# If not (rare), install it manually:
-sudo apt install certbot python3-certbot-apache -y
-```
-
-### Request and install the certificate
-
-We have to install an SSL certificate on both the root and www, even if we're just doing a redirect to the root.
-
-Browsers are checking the domain on port 443 first, and if the SSL/TLS handshake fails (no certificate) then it can't complete the redirect. Make sure you install the SSL certificate on both versions of the domain. It's free!
-
-```zsh
-# Run Certbot’s Apache plugin:
-sudo certbot --apache -d fiberandkraft.com -d www.fiberandkraft.com
-```
-
-#### Certbot will:
-
-1. Ask for your email (for renewal notices)
-2. Ask to agree to the terms
-3. Automatically edit Apache to use HTTPS
-4. Reload Apache
-
-```zsh
-# When it’s done, you’ll see something like:
-Congratulations! Your certificate and chain have been saved at:
-/etc/letsencrypt/live/fiberandkraft.com/fullchain.pem
-```
-
-### Enable SSL site if needed
-
-```zsh
-sudo a2ensite 000-default-le-ssl.conf
-sudo systemctl reload apache2
-```
-
-### Run this if in a redirect loop
-
-```zsh
-sudo a2enmod ssl
-sudo systemctl reload apache2
-```
-
-### Auto-renewal check
-
-```zsh
-# Certbot installs a renewal timer automatically.
-# It checks twice per day, ~12 hours
-# If it's within 30 days of renewal, it renews automatically
-# Verify it
-sudo systemctl list-timers | grep certbot
-
-# Manual dry-run
-sudo certbot renew --dry-run
-
-# Output should end with
-Congratulations, all renewals succeeded.
-```
-
-### Verify which domains are active
-
-```zsh
-sudo certbot certificates
-
-# You’ll see a list like:
-Certificate Name: fiberandkraft.com
-Domains: fiberandkraft.com www.fiberandkraft.com
-Expiry Date: 2026-01-20
-```
-
-## Edit the Apache Virtual Host Files
-
-### Port 80 VHost
+Configure the port 80 virtual host before requesting the SSL certificate. Certbot can then identify the correct domain and add the HTTPS configuration for you.
 
 ```zsh
 sudo nano /etc/apache2/sites-available/000-default.conf
 ```
 
-Add this INSIDE `<VirtualHost *:80> </VirtualHost>`, at the top of the page.
+The virtual host should include the domain names, document root, and directory rules:
 
-```zsh
-ServerName fiberandkraft.com
-ServerAlias www.fiberandkraft.com
-Redirect 301 / https://fiberandkraft.com/
-```
-
-Comment out these four rewrite lines at the bottom of the file:
-
-```zsh
-# RewriteEngine on
-# RewriteCond %{SERVER_NAME} =www.fiberandkraft.com [OR]
-# RewriteCond %{SERVER_NAME} =fiberandkraft.com
-# RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
-```
-
-### Port 443 VHost
-
-```zsh
-sudo nano /etc/apache2/sites-available/000-default-le-ssl.conf
-```
-
-The port 443 vhost file should look like this:
-
-```zsh
-<IfModule mod_ssl.c>
-<VirtualHost *:443>
+```apache
+<VirtualHost *:80>
     ServerAdmin webmaster@localhost
-    DocumentRoot /var/www/html
     ServerName fiberandkraft.com
     ServerAlias www.fiberandkraft.com
-
-    RewriteEngine On
-    RewriteCond %{HTTP_HOST} ^www\.fiberandkraft\.com$ [NC]
-    RewriteRule ^ https://fiberandkraft.com%{REQUEST_URI} [R=301,L]
+    DocumentRoot /var/www/html
 
     <Directory /var/www/html/>
-        Options Indexes FollowSymLinks
+        Options -Indexes +FollowSymLinks
         AllowOverride All
         Require all granted
     </Directory>
 
     ErrorLog ${APACHE_LOG_DIR}/error.log
     CustomLog ${APACHE_LOG_DIR}/access.log combined
-
-    <IfModule mod_dir.c>
-        DirectoryIndex index.php index.pl index.cgi index.html index.xhtml index.htm
-    </IfModule>
-
-    Include /etc/letsencrypt/options-ssl-apache.conf
-    SSLCertificateFile /etc/letsencrypt/live/fiberandkraft.com/fullchain.pem
-    SSLCertificateKeyFile /etc/letsencrypt/live/fiberandkraft.com/privkey.pem
 </VirtualHost>
-</IfModule>
 ```
 
-### Make sure the rewite module is enabled and reload Apache
+`-Indexes` prevents Apache from displaying a directory listing when a directory has no index file. Keep `AllowOverride All` only if the site uses `.htaccess`; otherwise, use `AllowOverride None`.
+
+### Test and reload Apache
+
+Always test Apache's configuration before reloading it:
+
+```zsh
+sudo apache2ctl configtest
+sudo systemctl reload apache2
+sudo apache2ctl -S
+```
+
+`configtest` should report `Syntax OK`, and the virtual-host listing should associate both domain names with `000-default.conf`.
+
+## Let's Encrypt
+
+### Make sure DNS and HTTP are ready
+
+```zsh
+dig +short fiberandkraft.com
+dig +short www.fiberandkraft.com
+curl -I http://fiberandkraft.com
+curl -I http://www.fiberandkraft.com
+```
+
+Both DNS commands should resolve to the Droplet. Both HTTP requests should reach this Apache site before you continue.
+
+### Check that Certbot is installed
+
+The current LAMP 1-Click image includes Certbot. If it is missing, install Certbot and its Apache plugin:
+
+```zsh
+certbot --version
+
+# Run this only if Certbot is not installed
+sudo apt update
+sudo apt install certbot python3-certbot-apache -y
+```
+
+### Request and install the certificate
+
+Include both names in the certificate so HTTPS works before the `www` request redirects to the root domain.
+
+```zsh
+sudo certbot --apache -d fiberandkraft.com -d www.fiberandkraft.com
+```
+
+Certbot will ask for an email address, ask you to agree to the terms, update Apache, and reload it. Choose the option to redirect HTTP traffic to HTTPS when prompted.
+
+Do not manually replace Certbot's generated SSL virtual host. Let Certbot manage its certificate paths and renewal configuration.
+
+### Check automatic renewal
+
+```zsh
+sudo systemctl list-timers | grep certbot
+sudo certbot renew --dry-run
+sudo certbot certificates
+```
+
+The dry run should complete successfully, and the certificate listing should include both `fiberandkraft.com` and `www.fiberandkraft.com`.
+
+### Redirect www to the root domain
+
+Certbot can redirect HTTP to HTTPS, but it does not necessarily make the root domain canonical. Use `sudo apache2ctl -S` to identify the active port 443 virtual-host file, then open that file. On this one-site setup, Certbot normally creates:
+
+```zsh
+sudo nano /etc/apache2/sites-available/000-default-le-ssl.conf
+```
+
+Add these rules inside the `<VirtualHost *:443>` block:
+
+```apache
+RewriteEngine On
+RewriteCond %{HTTP_HOST} ^www\.fiberandkraft\.com$ [NC]
+RewriteRule ^ https://fiberandkraft.com%{REQUEST_URI} [R=301,L]
+```
+
+Enable the rewrite module, test the complete configuration, and reload Apache:
 
 ```zsh
 sudo a2enmod rewrite
-sudo systemctl reload apache2
-
-# If you want to be extra sure the SSL vhost is active:
-sudo a2ensite 000-default-le-ssl.conf
+sudo apache2ctl configtest
 sudo systemctl reload apache2
 ```
 
-### Test the redirects
+### Test HTTPS and redirects
 
 ```zsh
-# Then you can confirm the redirect behavior later in your browser or by running:
 curl -I http://fiberandkraft.com
 curl -I http://www.fiberandkraft.com
 curl -I https://fiberandkraft.com
 curl -I https://www.fiberandkraft.com
+```
 
-# You should see:
-HTTP/1.1 301 Moved Permanently
-Location: https://fiberandkraft.com/
+The HTTP requests should redirect to HTTPS. If you also want `www` to redirect to the root domain, confirm that the final URL is `https://fiberandkraft.com/`.
+
+If you encounter a redirect loop, inspect the enabled virtual hosts and redirect rules instead of repeatedly enabling modules:
+
+```zsh
+sudo apache2ctl configtest
+sudo apache2ctl -S
+sudo grep -R "Redirect\|RewriteRule" /etc/apache2/sites-enabled/
 ```
 
 ### Test the result
 
-🔒 You should see the lock icon and your site.
-
-```zsh
-# Open your site in the browser
-http://fiberandkraft.com
-http://www.fiberandkraft.com
-https://fiberandkraft.com
-https://www.fiberandkraft.com
-```
+🔒 Open `https://fiberandkraft.com` in a browser. You should see the lock icon and your site.
